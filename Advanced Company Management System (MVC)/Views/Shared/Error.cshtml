@@ -1,0 +1,118 @@
+﻿@model Advanced_Company_Management_System__MVC_.Models.ErrorViewModel
+
+@{
+    ViewData["Title"] = "Error";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5 text-center">
+                    <!-- Error Icon -->
+                    <div class="mb-4">
+                        @if (Model?.StatusCode == 404)
+                        {
+                            <i class="bi bi-compass" style="font-size: 5rem; color: #6c757d;"></i>
+                        }
+                        else if (Model?.StatusCode == 401 || Model?.StatusCode == 403)
+                        {
+                            <i class="bi bi-shield-exclamation" style="font-size: 5rem; color: #ffc107;"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-exclamation-triangle-fill" style="font-size: 5rem; color: #dc3545;"></i>
+                        }
+                    </div>
+
+                    <!-- Error Code -->
+                    @if (Model?.StatusCode != null && Model.StatusCode != 0)
+                    {
+                        <h1 class="display-4 fw-bold text-danger mb-3">
+                            Error @Model.StatusCode
+                        </h1>
+                    }
+                    else
+                    {
+                        <h1 class="display-4 fw-bold text-danger mb-3">
+                            Oops! Something Went Wrong
+                        </h1>
+                    }
+
+                    <!-- User-Friendly Message -->
+                    <div class="mb-4">
+                        <p class="lead text-muted">
+                            @if (Model?.StatusCode != null && Model.StatusCode != 0)
+                            {
+                                @Model.GetUserFriendlyMessage()
+                            }
+                            else
+                            {
+                                <text>We apologize for the inconvenience. An unexpected error has occurred.</text>
+                            }
+                        </p>
+                    </div>
+
+                    <!-- Error Details (Development Only) -->
+                    @if (Model?.ShowDetails == true && !string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-warning text-start mb-4">
+                            <h5 class="alert-heading">
+                                <i class="bi bi-info-circle"></i> Error Details (Development Mode)
+                            </h5>
+                            <hr>
+                            <p class="mb-2"><strong>Message:</strong></p>
+                            <p class="font-monospace small">@Model.ErrorMessage</p>
+                            
+                            @if (!string.IsNullOrEmpty(Model.StackTrace))
+                            {
+                                <hr>
+                                <p class="mb-2"><strong>Stack Trace:</strong></p>
+                                <pre class="font-monospace small text-start" style="max-height: 300px; overflow-y: auto;">@Model.StackTrace</pre>
+                            }
+                            
+                            @if (Model.ShowRequestId)
+                            {
+                                <hr>
+                                <p class="mb-0"><strong>Request ID:</strong> <code>@Model.RequestId</code></p>
+                            }
+                        </div>
+                    }
+
+                    <!-- Helpful Actions -->
+                    <div class="mt-4">
+                        <h5 class="mb-3">What can you do?</h5>
+                        <div class="d-flex flex-column gap-2 align-items-center">
+                            <a href="javascript:history.back()" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-left"></i> Go Back
+                            </a>
+                            <a href="/" class="btn btn-primary">
+                                <i class="bi bi-house"></i> Go to Home Page
+                            </a>
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <a href="/CompanyDet/GetAllcomp" class="btn btn-outline-secondary">
+                                    <i class="bi bi-building"></i> View Companies
+                                </a>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Support Information -->
+                    <div class="mt-5 pt-4 border-top">
+                        <p class="text-muted small mb-0">
+                            <i class="bi bi-info-circle"></i> 
+                            If this problem persists, please contact your system administrator.
+                            @if (Model?.ShowRequestId == true)
+                            {
+                                <br>
+                                <span class="font-monospace">Request ID: @Model.RequestId</span>
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

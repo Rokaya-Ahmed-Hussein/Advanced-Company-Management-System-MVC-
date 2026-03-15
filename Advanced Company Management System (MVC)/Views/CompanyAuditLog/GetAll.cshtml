@@ -1,0 +1,61 @@
+﻿@using BL.ViewModels.CompanyAuditLog
+@using DTO.Data.Models
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model List<CompanyAuditLogReadVM>
+
+<div class="container mt-4">
+
+    <h5 class="mb-3">All Audit Log</h5>
+
+    <table class="table table-bordered table-hover shadow-sm">
+        <thead class="table-primary">
+            <tr>
+                <th>Company Id</th>
+                <th>Operation Type</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@item.CompanyId</td>
+
+                    <td>
+                        @if (item.OperationType == "Delete")
+                        {
+                            <span class="badge bg-danger">Delete</span>
+                        }
+                        else if (item.OperationType == "Update")
+                        {
+                            <span class="badge bg-warning text-dark">Update</span>
+                        }
+                        else if (item.OperationType == "Insert")
+                        {
+                            <span class="badge bg-success">Insert</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@item.OperationType</span>
+                        }
+                    </td>
+
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary"
+                           href="/CompanyAuditLog/GetById/@item.AuditId">
+                            Details
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

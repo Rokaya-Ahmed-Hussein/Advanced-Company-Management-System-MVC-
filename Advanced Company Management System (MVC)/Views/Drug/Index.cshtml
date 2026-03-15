@@ -1,0 +1,158 @@
+@model BL.ViewModels.Drug.DrugFilterVM
+
+@{
+    ViewData["Title"] = "Drug Management - GetDrugsData View";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="fw-bold text-primary">
+                <i class="bi bi-capsule"></i> Drug Management
+            </h2>
+            <p class="text-muted">Browse and search pharmaceutical drugs</p>
+        </div>
+    </div>
+
+    <!-- Filter and Search Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <!-- Drug Type Filter (Radio Buttons) - Filters by DrugTypeName -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-filter"></i> Drug Type (DrugTypeName)
+                    </label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="drugType" id="typeHuman" 
+                                   value="Human Pharmaceutical" @(Model.DrugType == "Human Pharmaceutical" ? "checked" : "")>
+                            <label class="form-check-label" for="typeHuman">
+                                <strong>Human Pharmaceutical</strong> (Default)
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="drugType" id="typeBio" 
+                                   value="Biological" @(Model.DrugType == "Biological" ? "checked" : "")>
+                            <label class="form-check-label" for="typeBio">
+                                <strong>Biological</strong>
+                            </label>
+                        </div>
+                    </div>
+                    <small class="text-muted">Filter by DrugTypeName column</small>
+                </div>
+
+                <!-- Real-Time Server-Side Search Bar -->
+                <div class="col-md-6 mb-3">
+                    <label for="searchInput" class="form-label fw-semibold">
+                        <i class="bi bi-search"></i> Real-Time Server-Side Search
+                    </label>
+                    <input type="text" id="searchInput" class="form-control" 
+                           placeholder="Search by drug name, company, or trade code..." 
+                           value="@Model.SearchTerm">
+                    <small class="text-muted">
+                        <i class="bi bi-lightning-fill text-warning"></i> Instant results - Server-side search
+                    </small>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="text-center" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-muted mt-2">Searching drugs...</p>
+    </div>
+
+    <!-- Drug List Table (Dynamic Content) -->
+    <div id="drugListContainer" class="card shadow-sm">
+        <div class="card-body">
+            <partial name="_DrugListPartial" model="Model" />
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let debounceTimer;
+
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[JavaScript] DOM loaded, attaching event listeners');
+            
+            // Attach search input event listener
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                console.log('[JavaScript] Search input found, attaching keyup event');
+                searchInput.addEventListener('keyup', function(e) {
+                    console.log('[JavaScript] Keyup detected, value:', e.target.value);
+                    filterDrugs();
+                });
+            } else {
+                console.error('[JavaScript] Search input NOT found!');
+            }
+            
+            // Attach radio button event listeners
+            const radioButtons = document.querySelectorAll('input[name="drugType"]');
+            console.log('[JavaScript] Found', radioButtons.length, 'radio buttons');
+            radioButtons.forEach(function(radio) {
+                radio.addEventListener('change', function(e) {
+                    console.log('[JavaScript] Radio changed to:', e.target.value);
+                    filterDrugs();
+                });
+            });
+        });
+
+        // Filter drugs with debounce for real-time search
+        function filterDrugs() {
+            console.log('[JavaScript] filterDrugs() called');
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function() {
+                console.log('[JavaScript] Debounce timeout fired, calling loadPage(1)');
+                loadPage(1); // Reset to page 1 when filtering
+            }, 300); // Wait 300ms after user stops typing (instant results)
+        }
+
+        // Load specific page - Server-Side Pagination
+        function loadPage(pageNumber) {
+            const drugType = document.querySelector('input[name="drugType"]:checked').value;
+            const searchTerm = document.getElementById('searchInput').value;
+
+            console.log('[JavaScript] Loading page:', pageNumber, 'DrugType:', drugType, 'Search:', searchTerm);
+
+            // Show loading indicator
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('drugListContainer').style.opacity = '0.5';
+
+            const url = `/Drug/SearchDrugs?drugType=${encodeURIComponent(drugType)}&searchTerm=${encodeURIComponent(searchTerm)}&page=${pageNumber}&pageSize=10`;
+            console.log('[JavaScript] Fetching URL:', url);
+
+            // AJAX call to server - Server-Side Processing
+            fetch(url)
+                .then(response => {
+                    console.log('[JavaScript] Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    console.log('[JavaScript] Received HTML, length:', html.length, 'characters');
+                    document.getElementById('drugListContainer').innerHTML = '<div class="card-body">' + html + '</div>';
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    document.getElementById('drugListContainer').style.opacity = '1';
+                    console.log('[JavaScript] UI updated successfully');
+                })
+                .catch(error => {
+                    console.error('[JavaScript] Error:', error);
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    document.getElementById('drugListContainer').style.opacity = '1';
+                    alert('Error loading drugs: ' + error.message);
+                });
+        }
+    </script>
+}
+

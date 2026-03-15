@@ -1,0 +1,237 @@
+﻿@model BL.ViewModels.CompanyDet.CompanyDetReadVM
+
+@{
+    ViewData["Title"] = "Company Details";
+    var isExpired = Model.CommRegExpireDate.HasValue && Model.CommRegExpireDate.Value < DateTime.Now;
+    var isExpiringSoon = Model.CommRegExpireDate.HasValue && 
+                        Model.CommRegExpireDate.Value >= DateTime.Now && 
+                        Model.CommRegExpireDate.Value <= DateTime.Now.AddMonths(3);
+}
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold text-primary mb-2">
+                        <i class="bi bi-building-fill"></i> Company Details
+                    </h2>
+                    <p class="text-muted">View complete company information</p>
+                </div>
+                <div>
+                    <a asp-action="GetAllcomp" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Details Card -->
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="bi bi-building"></i> @Model.CompName
+                        </h4>
+                        @if (isExpired)
+                        {
+                            <span class="badge bg-danger">EXPIRED</span>
+                        }
+                        else if (isExpiringSoon)
+                        {
+                            <span class="badge bg-warning text-dark">EXPIRING SOON</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">ACTIVE</span>
+                        }
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Basic Information -->
+                    <div class="mb-4">
+                        <h5 class="text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-info-circle-fill"></i> Basic Information
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small fw-semibold">Company ID</label>
+                                <div class="fw-bold">#@Model.CompanyDetId</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small fw-semibold">Company Name</label>
+                                <div class="fw-bold">@Model.CompName</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small fw-semibold">Company Type</label>
+                                <div>
+                                    @if (!string.IsNullOrEmpty(Model.CompTypeId))
+                                    {
+                                        <span class="badge bg-info">@Model.CompTypeId</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Commercial Registration -->
+                    <div class="mb-4">
+                        <h5 class="text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-card-list"></i> Commercial Registration
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="text-muted small fw-semibold">Registration Number</label>
+                                <div class="fw-bold">@(Model.CommRegNo ?? "-")</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="text-muted small fw-semibold">Issue Date</label>
+                                <div>
+                                    @if (Model.CommRegIssuDate.HasValue)
+                                    {
+                                        <i class="bi bi-calendar-check text-success"></i>
+                                        <span>@Model.CommRegIssuDate.Value.ToString("dd MMM yyyy")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not Set</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="text-muted small fw-semibold">Expire Date</label>
+                                <div>
+                                    @if (Model.CommRegExpireDate.HasValue)
+                                    {
+                                        if (isExpired)
+                                        {
+                                            <i class="bi bi-calendar-x text-danger"></i>
+                                            <span class="text-danger fw-bold">@Model.CommRegExpireDate.Value.ToString("dd MMM yyyy")</span>
+                                        }
+                                        else if (isExpiringSoon)
+                                        {
+                                            <i class="bi bi-calendar-event text-warning"></i>
+                                            <span class="text-warning fw-bold">@Model.CommRegExpireDate.Value.ToString("dd MMM yyyy")</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-calendar-check text-success"></i>
+                                            <span>@Model.CommRegExpireDate.Value.ToString("dd MMM yyyy")</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not Set</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tax Card Information -->
+                    <div class="mb-4">
+                        <h5 class="text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-receipt-cutoff"></i> Tax Card Information
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="text-muted small fw-semibold">Tax Card Number</label>
+                                <div class="fw-bold">@(Model.TaxCardNo ?? "-")</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="text-muted small fw-semibold">Issue Date</label>
+                                <div>
+                                    @if (Model.TaxCardIssuDate.HasValue)
+                                    {
+                                        <i class="bi bi-calendar-check text-success"></i>
+                                        <span>@Model.TaxCardIssuDate.Value.ToString("dd MMM yyyy")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not Set</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="text-muted small fw-semibold">Expire Date</label>
+                                <div>
+                                    @if (Model.TaxCardExpireDate.HasValue)
+                                    {
+                                        <i class="bi bi-calendar-event text-info"></i>
+                                        <span>@Model.TaxCardExpireDate.Value.ToString("dd MMM yyyy")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not Set</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row">
+                        <div class="col-12">
+                            <hr class="my-4">
+                            <div class="d-flex justify-content-between flex-wrap gap-2">
+                                <div>
+                                    <a asp-action="GetAllcomp" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left"></i> Back to List
+                                    </a>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a asp-action="UpdateCompDet" asp-route-id="@Model.CompanyDetId" class="btn btn-warning">
+                                        <i class="bi bi-pencil-fill"></i> Edit
+                                    </a>
+                                    <button type="button" class="btn btn-danger" onclick="confirmDelete(@Model.CompanyDetId, '@Model.CompName')">
+                                        <i class="bi bi-trash-fill"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(companyId, companyName) {
+            if (confirm(`Are you sure you want to delete "${companyName}"? This action will be logged in the audit system.`)) {
+                // Create a form and submit it
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/CompanyDet/Delete';
+                
+                // Add anti-forgery token
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = '__RequestVerificationToken';
+                tokenInput.value = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+                form.appendChild(tokenInput);
+                
+                // Add company ID
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'id';
+                idInput.value = companyId;
+                form.appendChild(idInput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+    @Html.AntiForgeryToken()
+}
+

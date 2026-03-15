@@ -1,0 +1,243 @@
+@model BL.ViewModels.CompanyDet.CompanyFilterVM
+
+<!-- Results Summary -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h5 class="mb-0">
+            <span class="badge bg-primary">@Model.TotalRecords</span> 
+            <span class="text-muted">Total Companies</span>
+        </h5>
+    </div>
+    <div class="text-muted">
+        <small>
+            Showing @((Model.PageNumber - 1) * Model.PageSize + 1) to @(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalRecords)) 
+            of @Model.TotalRecords entries
+        </small>
+    </div>
+</div>
+
+<!-- Company Table -->
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-primary">
+            <tr>
+                <th scope="col" style="width: 5%;">#</th>
+                <th scope="col" style="width: 20%;">
+                    <i class="bi bi-building"></i> Company Name
+                </th>
+                <th scope="col" style="width: 12%;">
+                    <i class="bi bi-tag"></i> Type
+                </th>
+                <th scope="col" style="width: 12%;">
+                    <i class="bi bi-calendar-check"></i> Reg. Issue
+                </th>
+                <th scope="col" style="width: 12%;">
+                    <i class="bi bi-calendar-x"></i> Reg. Expiry
+                </th>
+                <th scope="col" style="width: 12%;">
+                    <i class="bi bi-receipt"></i> Tax Card
+                </th>
+                <th scope="col" style="width: 12%;">
+                    <i class="bi bi-calendar-event"></i> Tax Expiry
+                </th>
+                <th scope="col" class="text-center" style="width: 15%;">
+                    <i class="bi bi-gear"></i> Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Companies.Any())
+            {
+                int index = (Model.PageNumber - 1) * Model.PageSize;
+                @foreach (var item in Model.Companies)
+                {
+                    index++;
+                    var isExpiringSoon = item.CommRegExpireDate.HasValue && 
+                                        item.CommRegExpireDate.Value <= DateTime.Now.AddMonths(3) && 
+                                        item.CommRegExpireDate.Value >= DateTime.Now;
+                    var isExpired = item.CommRegExpireDate.HasValue && item.CommRegExpireDate.Value < DateTime.Now;
+                    
+                    <tr class="@(isExpired ? "table-danger" : isExpiringSoon ? "table-warning" : "")">
+                        <td class="fw-bold text-muted">@index</td>
+                        <td>
+                            <div class="fw-semibold">@item.CompName</div>
+                            @if (!string.IsNullOrEmpty(item.CommRegNo))
+                            {
+                                <small class="text-muted">Reg: @item.CommRegNo</small>
+                            }
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.CompTypeId))
+                            {
+                                <span class="badge bg-info">@item.CompTypeId</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.CommRegIssuDate.HasValue)
+                            {
+                                <span>@item.CommRegIssuDate.Value.ToString("dd MMM yyyy")</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">N/A</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.CommRegExpireDate.HasValue)
+                            {
+                                <span>@item.CommRegExpireDate.Value.ToString("dd MMM yyyy")</span>
+                                @if (isExpired)
+                                {
+                                    <br/><small class="badge bg-danger">Expired</small>
+                                }
+                                else if (isExpiringSoon)
+                                {
+                                    <br/><small class="badge bg-warning text-dark">Expiring Soon</small>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">N/A</span>
+                            }
+                        </td>
+                        <td>@(item.TaxCardNo ?? "-")</td>
+                        <td>
+                            @if (item.TaxCardExpireDate.HasValue)
+                            {
+                                <span>@item.TaxCardExpireDate.Value.ToString("dd MMM yyyy")</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">N/A</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="/CompanyDet/GetCompById/@item.CompanyDetId" 
+                                   class="btn btn-info" 
+                                   title="View Details">
+                                    <i class="bi bi-eye-fill"></i>
+                                </a>
+                                <a href="/CompanyDet/UpdateCompDet/@item.CompanyDetId" 
+                                   class="btn btn-warning" 
+                                   title="Edit">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <button type="button" 
+                                        class="btn btn-danger" 
+                                        onclick="deleteCompany(@item.CompanyDetId)"
+                                        title="Delete">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <div class="text-muted">
+                            <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                            <p class="mt-3 mb-0">No companies found matching your criteria.</p>
+                            <small>Try adjusting your filters or search terms.</small>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination Controls -->
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Company pagination" class="mt-4">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="text-muted mb-0">
+                    Page <strong>@Model.PageNumber</strong> of <strong>@Model.TotalPages</strong>
+                </p>
+            </div>
+            <div class="col-md-6">
+                <ul class="pagination justify-content-end mb-0">
+                    <!-- First Page -->
+                    @if (Model.PageNumber > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="loadPage(1); return false;" title="First Page">
+                                <i class="bi bi-chevron-bar-left"></i>
+                            </a>
+                        </li>
+                    }
+
+                    <!-- Previous Button -->
+                    <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <a class="page-link" href="#" onclick="loadPage(@(Model.PageNumber - 1)); return false;" title="Previous">
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </a>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    @{
+                        int startPage = Math.Max(1, Model.PageNumber - 2);
+                        int endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+                    }
+
+                    @if (startPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="loadPage(1); return false;">1</a>
+                        </li>
+                        @if (startPage > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                    }
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" href="#" onclick="loadPage(@i); return false;">@i</a>
+                        </li>
+                    }
+
+                    @if (endPage < Model.TotalPages)
+                    {
+                        @if (endPage < Model.TotalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="loadPage(@Model.TotalPages); return false;">@Model.TotalPages</a>
+                        </li>
+                    }
+
+                    <!-- Next Button -->
+                    <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                        <a class="page-link" href="#" onclick="loadPage(@(Model.PageNumber + 1)); return false;" title="Next">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    <!-- Last Page -->
+                    @if (Model.PageNumber < Model.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="#" onclick="loadPage(@Model.TotalPages); return false;" title="Last Page">
+                                <i class="bi bi-chevron-bar-right"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+}
+
+

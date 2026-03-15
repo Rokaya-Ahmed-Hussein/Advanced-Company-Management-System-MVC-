@@ -1,0 +1,155 @@
+﻿@model BL.ViewModels.CompanyDet.CompanyDetAddVM
+
+@{
+    ViewData["Title"] = "Add New Company";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold text-primary mb-2">
+                        <i class="bi bi-plus-circle"></i> Add New Company
+                    </h2>
+                    <p class="text-muted">Fill in the details below to register a new company</p>
+                </div>
+                <div>
+                    <a asp-action="GetAllcomp" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building"></i> Company Information
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="SaveNew" asp-controller="CompanyDet" method="post" id="addCompanyForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <!-- Basic Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-info-circle"></i> Basic Information
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CompName" class="form-label fw-semibold">
+                                    <i class="bi bi-building"></i> Company Name <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="CompName" class="form-control" placeholder="Enter company name" />
+                                <span asp-validation-for="CompName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CompTypeId" class="form-label fw-semibold">
+                                    <i class="bi bi-tag"></i> Company Type
+                                </label>
+                                <input asp-for="CompTypeId" type="text" class="form-control" placeholder="Enter company type" />
+                                <span asp-validation-for="CompTypeId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Commercial Registration -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-card-list"></i> Commercial Registration
+                                </h6>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CommRegNo" class="form-label fw-semibold">
+                                    <i class="bi bi-hash"></i> Registration Number
+                                </label>
+                                <input asp-for="CommRegNo" class="form-control" placeholder="Reg. number" />
+                                <span asp-validation-for="CommRegNo" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CommRegIssuDate" class="form-label fw-semibold">
+                                    <i class="bi bi-calendar-check"></i> Issue Date
+                                </label>
+                                <input asp-for="CommRegIssuDate" type="date" class="form-control" />
+                                <span asp-validation-for="CommRegIssuDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CommRegExpireDate" class="form-label fw-semibold">
+                                    <i class="bi bi-calendar-x"></i> Expire Date
+                                </label>
+                                <input asp-for="CommRegExpireDate" type="date" class="form-control" />
+                                <span asp-validation-for="CommRegExpireDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tax Card Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-receipt"></i> Tax Card Information
+                                </h6>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="TaxCardNo" class="form-label fw-semibold">
+                                    <i class="bi bi-hash"></i> Tax Card Number
+                                </label>
+                                <input asp-for="TaxCardNo" class="form-control" placeholder="Tax card number" />
+                                <span asp-validation-for="TaxCardNo" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="TaxCardIssuDate" class="form-label fw-semibold">
+                                    <i class="bi bi-calendar-check"></i> Issue Date
+                                </label>
+                                <input asp-for="TaxCardIssuDate" type="date" class="form-control" />
+                                <span asp-validation-for="TaxCardIssuDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="TaxCardExpireDate" class="form-label fw-semibold">
+                                    <i class="bi bi-calendar-x"></i> Expire Date
+                                </label>
+                                <input asp-for="TaxCardExpireDate" type="date" class="form-control" />
+                                <span asp-validation-for="TaxCardExpireDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-between">
+                                    <a asp-action="GetAllcomp" class="btn btn-outline-secondary">
+                                        <i class="bi bi-x-circle"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary px-4">
+                                        <i class="bi bi-check-circle"></i> Add Company
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
