@@ -63,6 +63,8 @@ The application uses **Entity Framework Core** with the Database-First approach,
 - ✅ **Update**: Edit existing companies
 - ❌ **Delete**: Cannot delete companies (restricted to Admin only)
 - ✅ **Export**: Download Excel reports
+- ✅ **Audit Review**: View all audit logs
+
 
 #### 🔴 Admin Role (Full Access)
 - ✅ **Full CRUD**: Complete Create, Read, Update, Delete operations
